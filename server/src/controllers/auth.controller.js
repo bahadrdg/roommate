@@ -3,7 +3,7 @@ const User = require("../models/user.model");
 const generateToken = require("../utils/generateToken");
 const APIError = require("../utils/Error");
 
-const authUser = async (req, res) => {
+const loginUser = async (req, res) => {
     const { email, password } = req.body;
 
     try {
@@ -45,4 +45,4 @@ const logoutUser = (req, res) => {
 };
 
 
-module.exports = { authUser,logoutUser };
+module.exports = { loginUser,logoutUser };
