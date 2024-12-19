@@ -26,6 +26,10 @@ const formSchema = z.object({
 export default function MyForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      name_3061965256: "", // E-Posta alanı varsayılan boş string
+      name_4755107811: "", // Şifre alanı varsayılan boş string
+    },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
