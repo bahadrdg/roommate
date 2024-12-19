@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
@@ -14,55 +15,90 @@ import {
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { PhoneInput } from "@/components/ui/phone-input";
+import { useMutation, QueryClient } from "@tanstack/react-query";
+import axios from "axios";
+import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
-const formSchema =  z.object({
-  name_8798472954: z
+// QueryClient oluşturma
+const queryClient = new QueryClient();
+
+// Form doğrulama şeması
+const formSchema = z.object({
+  name: z
     .string()
     .nonempty({ message: "Bu Alan zorunludur." })
     .min(2, { message: "İsim En Az 2 Karakter Olabilir." })
     .max(30, { message: "İsim En Fazla 30 Karakter Olabilir." }),
-  name_4608428208: z
+  lastname: z
     .string()
     .nonempty({ message: "Bu Alan zorunludur." })
     .min(2, { message: "Soy İsim En Az 2 Karakter Olabilir." })
     .max(30, { message: "Soy İsim En Fazla 30 Karakter Olabilir." }),
-  name_3914205888: z
+  email: z
     .string()
     .nonempty({ message: "Bu Alan zorunludur." })
-    .email(),
-  name_9628956699: z
+    .email({ message: "Geçerli E-posta giriniz." }),
+  password: z
     .string()
     .nonempty({ message: "Bu Alan zorunludur." })
     .min(6, { message: "Şifre en az 6 karakter olmalıdır." })
-    .max(26, { message: "Şifre en fazla 23 karakter olabilir." }),
-  name_4770151517: z.string().nonempty({ message: "Bu Alan zorunludur." }),
+    .max(26, { message: "Şifre en fazla 26 karakter olabilir." }),
+  phone: z.string().nonempty({ message: "Bu Alan zorunludur." }),
 });
 
+// FormData türü
+type FormData = z.infer<typeof formSchema>;
+
 export default function MyForm() {
-  const form = useForm<z.infer<typeof formSchema>>({
+  // React Hook Form
+  const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      lastname: "",
+      email: "",
+      password: "",
+      phone: "",
+    },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      console.log(values);
-      toast(
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(values, null, 2)}</code>
-        </pre>
+  // TanStack Query - Mutation
+  const mutation = useMutation({
+    mutationFn: async (formData: FormData) => {
+      const response = await axios.post(
+        "http://localhost:5000/api/user/register",
+        formData
       );
-    } catch (error) {
-      console.error("Form submission error", error);
-      toast.error("Failed to submit the form. Please try again.");
-    }
-  }
+      return response.data;
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Başarılı!",
+        description: "Kayıt Başarıyla Gerçekleşti! Giriş Yapabilirsiniz!",
+      });
+      router.push("/login"); // Login sayfasına yönlendiriliyor
+    },
+    onError: (error: unknown) => {
+      toast({
+        title: "Hata!",
+        description: `Kayıt Gerçekleştrilemedi! =  ${error}`,
+      });
+    },
+  });
+
+  // Form Submit
+  const onSubmit = (values: FormData) => {
+    mutation.mutate(values);
+  };
+  const { toast } = useToast();
+  const router = useRouter()
 
   return (
     <div>
       <div className="border-2 border-dotted mx-24 p-10 max-lg:m-4">
         <Form {...form}>
           <h1 className="my-2">Yolculuğunuza Başlayın</h1>
-
           <h1 className="text-2xl font-bold my-2 mb-5">
             Room Mate{"'"}e Kayıt Ol
           </h1>
@@ -72,11 +108,11 @@ export default function MyForm() {
           >
             <FormField
               control={form.control}
-              name="name_8798472954"
+              name="name"
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder="İsim" type="" {...field} />
+                    <Input placeholder="İsim" type="text" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -85,11 +121,11 @@ export default function MyForm() {
 
             <FormField
               control={form.control}
-              name="name_4608428208"
+              name="lastname"
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input placeholder="Soy İsim" type="" {...field} />
+                    <Input placeholder="Soy İsim" type="text" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -98,7 +134,7 @@ export default function MyForm() {
 
             <FormField
               control={form.control}
-              name="name_3914205888"
+              name="email"
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
@@ -111,7 +147,7 @@ export default function MyForm() {
 
             <FormField
               control={form.control}
-              name="name_9628956699"
+              name="password"
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
@@ -124,7 +160,7 @@ export default function MyForm() {
 
             <FormField
               control={form.control}
-              name="name_4770151517"
+              name="phone"
               render={({ field }) => (
                 <FormItem className="flex flex-col items-start">
                   <FormControl className="w-full">
@@ -139,19 +175,20 @@ export default function MyForm() {
               )}
             />
 
-            <Button type="submit">Kayıt Ol</Button>
+            <Button type="submit" disabled={mutation.isLoading}>
+              {mutation.isLoading ? "Kaydediliyor..." : "Kayıt Ol"}
+            </Button>
           </form>
         </Form>
-        
       </div>
       <div className="text-end mr-24 max-lg:mr-5 py-5">
-          Hesabın Var mı?{" "}
-          <a href="/login">
-            <span className="text-blue-500 hover:border-b-2 border-blue-500">
-              Giriş Yap
-            </span>
-          </a>
-        </div>
+        Hesabın Var mı?{" "}
+        <a href="/login">
+          <span className="text-blue-500 hover:border-b-2 border-blue-500">
+            Giriş Yap
+          </span>
+        </a>
+      </div>
     </div>
   );
 }

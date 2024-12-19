@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-html-link-for-pages */
 import Login from "@/components/form/LoginForm";
 import Image from "next/image";
 import React from "react";
@@ -8,11 +9,13 @@ export default function page() {
       <div className="w-1/2 flex flex-col max-lg:w-full">
         <div className="m-5">
           <div className="flex">
-            <Image src={"/logo1.png"} alt="Logo" width={100} height={100} />
+            <a href="/">
+              <Image src={"/logo1.png"} alt="Logo" width={100} height={100} />
+            </a>
           </div>
         </div>
         <div className="">
-          <Login/>
+          <Login />
         </div>
       </div>
       <div className="flex w-1/2 max-lg:hidden">
