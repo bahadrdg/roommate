@@ -16,12 +16,11 @@ const registerValidation = async(req,res,next) => {
         })
     
         const test = await schema.validateAsync(req.body)
-        //console.log("test",test)
         next()
         
     } catch (error) {
-        //console.log("error",error.details[0].message)
-        throw new APIError(error.details[0].message,400)        
+        console.log("error",error.details[0].message)
+             
     }
     
 }
@@ -41,9 +40,8 @@ const loginValidation = async(req,res,next) => {
         next()
         
     } catch (error) {
-        //console.log("error",error.details[0].message)
-        throw new APIError(error.details[0].message,400)   
-        
+        console.log("error",error.details[0].message)
+         
     }
   
 }

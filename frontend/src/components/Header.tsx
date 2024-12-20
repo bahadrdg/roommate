@@ -1,13 +1,13 @@
 /* eslint-disable @next/next/no-html-link-for-pages */
 "use client";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   // DropdownMenuLabel,
-  // DropdownMenuSeparator,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { format } from "date-fns";
@@ -30,18 +30,24 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { User, Menu } from "lucide-react";
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 
-export default function Header() {
-  const [date, setDate] = React.useState<Date>();
+export default function Header({ onScrollChange }: { onScrollChange: (isScrolled: boolean) => void }) {
+  const [date, setDate] = React.useState<{
+    from: Date | undefined;
+    to: Date | undefined;
+  }>({ from: undefined, to: undefined });
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState("");
 
   const [guests, setGuests] = useState({
-    adults: 2,
+    adults: 1,
     children: 0,
     infants: 0,
     pets: 0,
   });
+  const [isScrolled, setIsScrolled] = useState(false);
 
   const updateGuestCount = (type: keyof typeof guests, increment: boolean) => {
     setGuests((prev) => ({
@@ -50,17 +56,50 @@ export default function Header() {
     }));
   };
 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    // Çerezden token kontrolü
+    const token = Cookies.get("token");
+    setIsLoggedIn(!!token);
+  }, []);
+
+  const handleLogout = () => {
+    // Çerezi temizleyerek çıkış işlemini gerçekleştir
+    Cookies.remove("token");
+    setIsLoggedIn(false);
+    router.push("/");
+  };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrolled = window.scrollY > 50;
+      setIsScrolled(scrolled);
+      onScrollChange(scrolled); // Parent'a değişikliği gönder
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [onScrollChange]);
   return (
-    <div className="border-b">
-      <div className="container mx-auto flex justify-between">
+    <div className={`w-full z-50  border-b ${isScrolled ? "fixed top-0 left-0 ":""}`}>
+      <div className="container mx-auto flex justify-between space-x-4 items-center">
         <a className="flex items-center" href="/">
-          <Image src="/logo1.png" alt="Logo" width={100} height={100} />
+          <Image className="min-w-16 min-h-16 " src="/logo1.png" alt="Logo" width={100} height={100} />
         </a>
 
-        <div className="flex items-center text-center rounded-full shadow-md border p-8 my-5 space-x-4 bg-white max-w-4xl mx-auto">
-          {/* Yer */}
+        <div
+          className={`container mx-auto md:px-8 lg:px-16 flex items-center text-center rounded-3xl shadow-md border p-5 my-5 space-x-4 max-sm:hidden max-lg:hidden bg-white max-w-4xl transition-all duration-300  ${
+            isScrolled ? "text-white py-0" : "text-black py-4"
+          }`}
+        >
           <div className={cn("grid gap-2")}>
-            <label className="block text-sm font-medium text-gray-500">
+            <label
+              className={`block text-sm font-medium max-lg:hidden text-gray-500 ${
+                isScrolled ? "hidden" : ""
+              }`}
+            >
               Yer
             </label>
             <Popover open={open} onOpenChange={setOpen}>
@@ -115,10 +154,18 @@ export default function Header() {
             </Popover>
           </div>
 
-          <div className="h-10 w-[1px]  bg-gray-200" />
+          <div
+            className={`h-10 w-[1px] max-lg:hidden  bg-gray-200 ${
+              isScrolled ? "hidden" : ""
+            }`}
+          />
 
           <div className={cn("grid gap-2")}>
-            <label className="block text-sm font-medium text-gray-500">
+            <label
+              className={`block text-sm font-medium max-lg:hidden text-gray-500  ${
+                isScrolled ? "hidden" : ""
+              }`}
+            >
               Giriş-Çıkış Tarihi Seçin
             </label>
             <Popover>
@@ -128,7 +175,7 @@ export default function Header() {
                   variant={"outline"}
                   className={cn(
                     "w-[300px] justify-start text-left font-normal",
-                    !date && "text-muted-foreground"
+                    !date.from && "text-muted-foreground"
                   )}
                 >
                   <CalendarIcon />
@@ -152,17 +199,27 @@ export default function Header() {
                   mode="range"
                   defaultMonth={date?.from}
                   selected={date}
-                  onSelect={setDate}
+                  onSelect={(range) =>
+                    setDate({ from: range?.from, to: range?.to })
+                  }
                   numberOfMonths={2}
                 />
               </PopoverContent>
             </Popover>
           </div>
 
-          <div className="h-10 w-[1px] bg-gray-200" />
+          <div
+            className={`h-10 w-[1px] max-lg:hidden bg-gray-200 ${
+              isScrolled ? "hidden" : ""
+            }`}
+          />
 
           <div className={cn("grid gap-2")}>
-            <label className="block text-sm font-medium text-gray-500">
+            <label
+              className={`block text-sm font-medium max-lg:hidden text-gray-500 ${
+                isScrolled ? "hidden" : ""
+              }`}
+            >
               Kişiler
             </label>
             <Popover>
@@ -231,7 +288,7 @@ export default function Header() {
 
                 <div className="mt-4 flex justify-between items-center">
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     className="text-sm text-gray-500"
                     onClick={() =>
                       setGuests({ adults: 1, children: 0, infants: 0, pets: 0 })
@@ -239,16 +296,17 @@ export default function Header() {
                   >
                     Temizle
                   </Button>
-                  <Button className="bg-pink-500 text-white hover:bg-pink-600 rounded-full">
-                    Tamam
-                  </Button>
                 </div>
               </PopoverContent>
             </Popover>
           </div>
 
           {/* Arama Butonu */}
-          <Button className="ml-4 h-12 w-12 rounded-full bg-pink-500 hover:bg-pink-600">
+          <Button
+            className={`ml-4 h-12 w-12 rounded-full bg-pink-500 hover:bg-pink-600 ${
+              isScrolled ? "h-8 w-8 m-4" : ""
+            }`}
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-6 w-6 text-white mx-auto"
@@ -265,24 +323,42 @@ export default function Header() {
             </svg>
           </Button>
         </div>
-        <div className=" flex items-center text-center">
+        <div className="flex items-center text-center">
           <DropdownMenu>
-            <DropdownMenuTrigger className="flex border-gray-500  border-2  p-2 rounded-full text-gray-500 hover:drop-shadow-xl">
+            <DropdownMenuTrigger className="flex border-gray-500 border-2 p-2 rounded-full text-gray-500 hover:drop-shadow-xl">
               <Menu className="mr-3" />
               <User />
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              <DropdownMenuItem className="font-bold">
-                <a href="/login">Oturum Açın</a>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <a href="/register">Kaydolun</a>
-              </DropdownMenuItem>
-              {/* <DropdownMenuSeparator />
-            <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Billing</DropdownMenuItem>
-            <DropdownMenuItem>Team</DropdownMenuItem>
-            <DropdownMenuItem>Subscription</DropdownMenuItem> */}
+              {isLoggedIn ? (
+                <>
+                  <DropdownMenuItem className="font-bold">
+                    <a href="/">Mesajlar</a>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="font-bold">
+                    <a href="/">Favoriler</a>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>
+                    <a href="/">Profilim</a>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <button onClick={handleLogout} className="text-red-500">
+                      Çıkış Yap
+                    </button>
+                  </DropdownMenuItem>
+                </>
+              ) : (
+                <>
+                  <DropdownMenuItem className="font-bold">
+                    <a href="/login">Oturum Açın</a>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuItem>
+                    <a href="/register">Kaydolun</a>
+                  </DropdownMenuItem>
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

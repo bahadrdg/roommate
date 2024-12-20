@@ -2,13 +2,12 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import Cookies from "js-cookie"; // Çerez yönetimi için ekleme
 
 import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -30,12 +29,14 @@ export default function MyForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-<<<<<<< HEAD
       email: "",
       password: "",
     },
   });
-  // OnSuccess kısmında token'i saklama
+
+  const { toast } = useToast();
+  const router = useRouter();
+
   const mutation = useMutation({
     mutationFn: async (formData: FormData) => {
       const response = await axios.post(
@@ -45,13 +46,14 @@ export default function MyForm() {
       return response.data;
     },
     onSuccess: (data) => {
-      localStorage.setItem("token", data.token);
-      console.log();
-      
+      // Çereze kaydetme
+      Cookies.set("token", data.token, { expires: 7, secure: true });
+
       toast({
         title: "Başarılı!",
         description: "Giriş Yapıldı",
       });
+
       router.push("/");
     },
     onError: (error: unknown) => {
@@ -59,36 +61,13 @@ export default function MyForm() {
         title: "Hata!",
         description: `Giriş Yapılamadı! = ${error}`,
       });
-      console.log(error);
-      
-=======
-      name_3061965256: "", // E-Posta alanı varsayılan boş string
-      name_4755107811: "", // Şifre alanı varsayılan boş string
->>>>>>> 67916c8ba1180d727909c3c4f1bb491b0d580bb6
+      console.error(error);
     },
   });
 
-  // Form Submit
   const onSubmit = (values: FormData) => {
     mutation.mutate(values);
   };
-
-  const { toast } = useToast();
-  const router = useRouter();
-
-  // function onSubmit(values: z.infer<typeof formSchema>) {
-  //   try {
-  //     console.log(values);
-  //     toast(
-  //       <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-  //         <code className="text-white">{JSON.stringify(values, null, 2)}</code>
-  //       </pre>
-  //     );
-  //   } catch (error) {
-  //     console.error("Form submission error", error);
-  //     toast.error("Failed to submit the form. Please try again.");
-  //   }
-  // }
 
   return (
     <div>

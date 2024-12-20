@@ -9,14 +9,14 @@ const loginUser = async (req, res) => {
     try {
         const user = await User.findOne({ email });
 
-        // Şifreyi bcrypt ile karşılaştır
         if (user && user.password === password) {
-            generateToken(res, user._id);
+            const token  = generateToken(res, user._id);
 
             res.json({
                 _id: user._id,
                 name: user.name,
                 email: user.email,
+                token : token
             });
         } else {
             throw new APIError("E-posta veya Şifre Hatalı", 401)
@@ -28,7 +28,7 @@ const loginUser = async (req, res) => {
 };
 
 const logoutUser = (req, res) => {
-    const token = req.cookies.jwt;
+    const token = req.cookies.token;
 
     // Eğer token yoksa, oturum açık değil demektir
     if (!token) {
@@ -36,7 +36,7 @@ const logoutUser = (req, res) => {
     }
 
     // Token mevcutsa, çıkış yap
-    res.cookie('jwt', '', {
+    res.cookie('token', '', {
         httpOnly: true,
         expires: new Date(0),
     });
