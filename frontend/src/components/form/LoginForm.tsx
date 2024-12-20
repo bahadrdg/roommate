@@ -30,6 +30,7 @@ export default function MyForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+<<<<<<< HEAD
       email: "",
       password: "",
     },
@@ -60,6 +61,10 @@ export default function MyForm() {
       });
       console.log(error);
       
+=======
+      name_3061965256: "", // E-Posta alanı varsayılan boş string
+      name_4755107811: "", // Şifre alanı varsayılan boş string
+>>>>>>> 67916c8ba1180d727909c3c4f1bb491b0d580bb6
     },
   });
 
