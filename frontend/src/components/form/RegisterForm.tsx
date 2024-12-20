@@ -20,8 +20,6 @@ import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 
-// QueryClient oluşturma
-const queryClient = new QueryClient();
 
 // Form doğrulama şeması
 const formSchema = z.object({
@@ -72,7 +70,7 @@ export default function MyForm() {
       );
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast({
         title: "Başarılı!",
         description: "Kayıt Başarıyla Gerçekleşti! Giriş Yapabilirsiniz!",
@@ -175,8 +173,8 @@ export default function MyForm() {
               )}
             />
 
-            <Button type="submit" disabled={mutation.isLoading}>
-              {mutation.isLoading ? "Kaydediliyor..." : "Kayıt Ol"}
+            <Button type="submit">
+               Kayıt Ol
             </Button>
           </form>
         </Form>

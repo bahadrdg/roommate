@@ -1,5 +1,4 @@
 "use client";
-import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -17,34 +16,74 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
+import axios from "axios";
+import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
+import { useMutation } from "@tanstack/react-query";
 
 const formSchema = z.object({
-  name_3061965256: z.string(),
-  name_4755107811: z.string(),
+  email: z.string().nonempty({ message: "Bu Alan Boş Geçilemez" }),
+  password: z.string().nonempty({ message: "Bu Alan Boş Geçilemez" }),
 });
 
 export default function MyForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name_3061965256: "", // E-Posta alanı varsayılan boş string
-      name_4755107811: "", // Şifre alanı varsayılan boş string
+      email: "",
+      password: "",
+    },
+  });
+  // OnSuccess kısmında token'i saklama
+  const mutation = useMutation({
+    mutationFn: async (formData: FormData) => {
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/login",
+        formData
+      );
+      return response.data;
+    },
+    onSuccess: (data) => {
+      localStorage.setItem("token", data.token);
+      console.log();
+      
+      toast({
+        title: "Başarılı!",
+        description: "Giriş Yapıldı",
+      });
+      router.push("/");
+    },
+    onError: (error: unknown) => {
+      toast({
+        title: "Hata!",
+        description: `Giriş Yapılamadı! = ${error}`,
+      });
+      console.log(error);
+      
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      console.log(values);
-      toast(
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(values, null, 2)}</code>
-        </pre>
-      );
-    } catch (error) {
-      console.error("Form submission error", error);
-      toast.error("Failed to submit the form. Please try again.");
-    }
-  }
+  // Form Submit
+  const onSubmit = (values: FormData) => {
+    mutation.mutate(values);
+  };
+
+  const { toast } = useToast();
+  const router = useRouter();
+
+  // function onSubmit(values: z.infer<typeof formSchema>) {
+  //   try {
+  //     console.log(values);
+  //     toast(
+  //       <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+  //         <code className="text-white">{JSON.stringify(values, null, 2)}</code>
+  //       </pre>
+  //     );
+  //   } catch (error) {
+  //     console.error("Form submission error", error);
+  //     toast.error("Failed to submit the form. Please try again.");
+  //   }
+  // }
 
   return (
     <div>
@@ -62,7 +101,7 @@ export default function MyForm() {
           >
             <FormField
               control={form.control}
-              name="name_3061965256"
+              name="email"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel></FormLabel>
@@ -77,7 +116,7 @@ export default function MyForm() {
 
             <FormField
               control={form.control}
-              name="name_4755107811"
+              name="password"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel></FormLabel>
@@ -95,13 +134,13 @@ export default function MyForm() {
         </Form>
       </div>
       <div className="text-start ml-24 max-lg:mr-5 py-5">
-          Hesabın Yok mu?{" "}
-          <a href="/register">
-            <span className="text-blue-500 hover:border-b-2 border-blue-500">
-              Kayıt Ol
-            </span>
-          </a>
-        </div>
+        Hesabın Yok mu?{" "}
+        <a href="/register">
+          <span className="text-blue-500 hover:border-b-2 border-blue-500">
+            Kayıt Ol
+          </span>
+        </a>
+      </div>
     </div>
   );
 }
