@@ -108,10 +108,10 @@ const CountrySelect = ({
       </PopoverTrigger>
       <PopoverContent className="w-[300px] p-0">
         <Command>
-          <CommandInput placeholder="Search country..." />
+          <CommandInput placeholder="Ülke ara..." />
           <CommandList>
             <ScrollArea className="h-72">
-              <CommandEmpty>No country found.</CommandEmpty>
+              <CommandEmpty>Ülke bulunamadı.</CommandEmpty>
               <CommandGroup>
                 {countryList.map(({ value, label }) =>
                   value ? (

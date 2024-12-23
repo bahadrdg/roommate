@@ -7,7 +7,7 @@ const { registerValidation, loginValidation } = require("../middlewares/validati
 const router = express.Router()
 
 router.post("/login", loginValidation , loginUser)
-router.post("/logout" , registerValidation, logoutUser )
+router.post("/logout" , logoutUser )
 
 
 module.exports = router;

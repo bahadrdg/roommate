@@ -26,6 +26,7 @@ const registerValidation = async(req,res,next) => {
 }
 
 const loginValidation = async(req,res,next) => {
+    
     try {
         const schema = joi.object({
             email : joi.string()

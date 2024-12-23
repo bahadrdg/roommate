@@ -33,13 +33,15 @@ import { User, Menu } from "lucide-react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 
-export default function Header({ onScrollChange }: { onScrollChange: (isScrolled: boolean) => void }) {
+
+
+export default function Header() {
   const [date, setDate] = React.useState<{
     from: Date | undefined;
     to: Date | undefined;
   }>({ from: undefined, to: undefined });
-  const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState("");
+  const [open, setOpen] = useState(false)
+  const [value, setValue] = useState("")
 
   const [guests, setGuests] = useState({
     adults: 1,
@@ -76,21 +78,26 @@ export default function Header({ onScrollChange }: { onScrollChange: (isScrolled
     const handleScroll = () => {
       const scrolled = window.scrollY > 50;
       setIsScrolled(scrolled);
-      onScrollChange(scrolled); // Parent'a değişikliği gönder
     };
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [onScrollChange]);
+  }, []);
   return (
-    <div className={`w-full z-50  border-b ${isScrolled ? "fixed top-0 left-0 ":""}`}>
-      <div className="container mx-auto flex justify-between space-x-4 items-center">
+    <div className={`fixed top-0 left-0 w-full z-50  border-b bg-white`}>
+      <div className="container mx-auto px-4 md:px-8 lg:px-16 flex justify-between space-x-4 items-center">
         <a className="flex items-center" href="/">
-          <Image className="min-w-16 min-h-16 " src="/logo1.png" alt="Logo" width={100} height={100} />
+          <Image
+            className="min-w-16 min-h-16 "
+            src="/logo1.png"
+            alt="Logo"
+            width={100}
+            height={100}
+          />
         </a>
 
         <div
-          className={`container mx-auto md:px-8 lg:px-16 flex items-center text-center rounded-3xl shadow-md border p-5 my-5 space-x-4 max-sm:hidden max-lg:hidden bg-white max-w-4xl transition-all duration-300  ${
+          className={` flex items-center text-center rounded-3xl shadow-md border p-5 my-5 space-x-4 max-sm:hidden max-lg:hidden bg-white max-w-4xl transition-all duration-300  ${
             isScrolled ? "text-white py-0" : "text-black py-4"
           }`}
         >
@@ -111,7 +118,7 @@ export default function Header({ onScrollChange }: { onScrollChange: (isScrolled
                   className="w-[200px] justify-between text-gray-500"
                 >
                   {value
-                    ? locations.find((locations) => locations.value === value)
+                    ? locations.find((location) => location.value === value)
                         ?.label
                     : "Yer Seçiniz..."}
                   <ChevronsUpDown className="opacity-50" />
@@ -123,24 +130,22 @@ export default function Header({ onScrollChange }: { onScrollChange: (isScrolled
                   <CommandList>
                     <CommandEmpty>Yer Bulunamadı.</CommandEmpty>
                     <CommandGroup>
-                      {locations.map((locations) => (
+                      {locations.map((location) => (
                         <CommandItem
-                          key={locations.value}
-                          value={locations.value}
-                          onSelect={(
-                            currentValue: React.SetStateAction<string>
-                          ) => {
+                          key={location.key}
+                          value={location.value}
+                          onSelect={(currentValue: string) => {
                             setValue(
                               currentValue === value ? "" : currentValue
                             );
                             setOpen(false);
                           }}
                         >
-                          {locations.label}
+                          {location.label}
                           <Check
                             className={cn(
                               "ml-auto",
-                              value === locations.value
+                              value === location.value
                                 ? "opacity-100"
                                 : "opacity-0"
                             )}
@@ -343,7 +348,7 @@ export default function Header({ onScrollChange }: { onScrollChange: (isScrolled
                     <a href="/">Profilim</a>
                   </DropdownMenuItem>
                   <DropdownMenuItem>
-                    <button onClick={handleLogout} className="text-red-500">
+                    <button onClick={handleLogout} className="text-bg-pink-500">
                       Çıkış Yap
                     </button>
                   </DropdownMenuItem>
@@ -369,7 +374,13 @@ export default function Header({ onScrollChange }: { onScrollChange: (isScrolled
 
 const locations = [
   {
+    key: "1",
     value: "turkiye",
     label: "Türkiye",
+  },
+  {
+    key: "2",
+    value: "almanya",
+    label: "Almanya",
   },
 ];
