@@ -2,7 +2,7 @@ const Advertisement = require('../models/advertisement.model'); // Modeli import
 
 // İlan oluştur
 exports.createAdvertisement = async (req, res) => {
-    console.log(req);
+    console.log(req.body);
     try {
         const { title, description, price, location, roomDetails, preferences, images } = req.body;
 
@@ -14,7 +14,7 @@ exports.createAdvertisement = async (req, res) => {
             roomDetails,
             // preferences,
             // images,
-            postedBy: req.user.id // İlanı oluşturan kullanıcıyı auth middleware ile alıyoruz
+            postedBy: req.user._id // İlanı oluşturan kullanıcıyı auth middleware ile alıyoruz
         });
 
         
