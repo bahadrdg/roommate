@@ -17,14 +17,14 @@ const advertisementSchema = new mongoose.Schema({
         required: true 
     },
     location: { 
-        type: String, 
+        type: [String],
         required: true, 
         trim: true 
     },
     postedBy: { 
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'user', 
-        required: true
+        required: false
     },
     createdAt: { 
         type: Date, 
@@ -46,7 +46,7 @@ const advertisementSchema = new mongoose.Schema({
         },
         size: { 
             type: Number, 
-            required: true // Square meters 
+            required: true 
         },
         furnished: { 
             type: Boolean, 
@@ -56,7 +56,7 @@ const advertisementSchema = new mongoose.Schema({
     preferences: {
         gender: { 
             type: String, 
-            enum: ['Male', 'Female'], 
+            enum: ['Male', 'Famale'], 
             default: 'Male' 
         },
         smoking: { 

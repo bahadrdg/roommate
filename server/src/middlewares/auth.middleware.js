@@ -4,15 +4,22 @@ const User = require('../models/user.model');
 const APIError = require('../utils/Error');
 
 const protect = asyncHandler(async (req, res, next) => {
-  let token = req.cookies.jwt; // JWT token'ı cookie'den alıyoruz
+  // Authorization header'dan token'i al
+  const authHeader = req.headers.authorization;
+  console.log('authHeader:', authHeader);
+  
 
-  if (!token) {
+  // Authorization header mevcut değilse hata döndür
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
     res.status(401);
     throw new APIError('Not authorized, no token provided', 401);
   }
 
+  // Token'i "Bearer" kelimesinden ayır
+  const token = authHeader.split(' ')[1];
+
   try {
-    // Token'ı çözümle
+    // Token'i doğrula
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     // Kullanıcıyı veritabanından bul ve şifreyi dahil etme

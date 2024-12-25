@@ -1,8 +1,9 @@
-const Advertisement = require('../models/advertisement.model'); // Modeli import ediyoruz
+const Advertisement = require('../models/advertisement.model');
+const APIError = require('../utils/Error'); // Hata yönetimi için kullandığınız APIError
+const asyncHandler = require('express-async-handler');
 
 // İlan oluştur
-exports.createAdvertisement = async (req, res) => {
-    console.log(req.body);
+exports.createAdvertisement = asyncHandler(async (req, res) => {
     try {
         const { title, description, price, location, roomDetails, preferences, images } = req.body;
 
@@ -10,22 +11,34 @@ exports.createAdvertisement = async (req, res) => {
             title,
             description,
             price,
-            location,
+            location, // location bir dizi olmalı, eğer değilse uygun şekilde kontrol edilebilir
             roomDetails,
-            // preferences,
-            // images,
+            preferences,
+            images, 
             postedBy: req.user._id // İlanı oluşturan kullanıcıyı auth middleware ile alıyoruz
         });
 
-        
-        
-
+        // Yeni ilan veritabanına kaydediliyor
         await newAd.save();
-        res.status(201).json({ message: 'Advertisement created successfully', advertisement: newAd });
+
+        // Başarı durumunda JSON yanıtı gönderiliyor
+        res.status(201).json({
+            message: 'Advertisement created successfully',
+            advertisement: newAd,
+            success: true
+        });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error });
+        console.error(error);
+
+        // Hata türüne göre daha anlamlı hata mesajı döndürülüyor
+        if (error.name === 'ValidationError') {
+            return res.status(400).json({ message: 'Validation error', error: error.errors });
+        }
+
+        // Genel hata durumunda
+        res.status(500).json({ message: 'Server error', error: error.message });
     }
-};
+});
 
 // Tüm ilanları listele
 exports.getAllAdvertisements = async (req, res) => {

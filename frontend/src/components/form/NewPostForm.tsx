@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { toast } from "sonner";
+// import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -34,33 +34,40 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
+import Cookies from "js-cookie";
+import { toast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
-  title: z.string().min(3).max(150),
-  description: z.string().min(3).max(500),
+  title: z.string().min(3, {message:"Başlık en az 3 karakter olamlı."}).max(150, {message:"Başlık en fazla 150 karakter olmalı."}),
+  description: z.string().min(5 ,{message: "İçerik en az 5 karakter olmalı."}).max(500, {message:"İçerik en fazla 500 karakter olmalı."}),
   price: z.string(),
-  location: z.tuple([z.string(), z.string().optional()]),
+  location: z.tuple([z.string(), z.string({message:"Dizi en az 2 öğe içermelidir"}).optional()]),
   images: z.string(),
-  roomType: z.string(),
-  size: z.string().max(5000),
-  furnished: z.boolean().default(true),
-  gender: z.string(),
-  smoking: z.boolean().default(true),
-  petsAllowed: z.boolean().default(true),
-  availability: z.boolean().default(true),
+  roomDetails: z.object({
+    roomType: z.string(),
+    size: z.string().max(5000),
+    furnished: z.boolean()
+  }),
+  preferences: z.object({
+    gender: z.string(),
+    smoking: z.boolean(),
+    petsAllowed: z.boolean()
+  }),
+  availability: z.boolean()
 });
+
+const dropZoneConfig = {
+  accept: { "image/*": [] },
+  maxFiles: 5,
+};
 
 export default function MyForm() {
   const [countryName, setCountryName] = useState<string>("");
   const [stateName, setStateName] = useState<string>("");
+  const [files, setFiles] = useState<File[]>([]);
 
-  const [files, setFiles] = useState<File[] | null>(null);
-
-  const dropZoneConfig = {
-    maxFiles: 5,
-    maxSize: 1024 * 1024 * 4,
-    multiple: true,
-  };
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -69,33 +76,74 @@ export default function MyForm() {
       price: "0",
       location: [""],
       images: "",
-      roomType: "",
-      size: "",
-      furnished: true,
-      gender: "",
-      smoking: true,
-      petsAllowed: true,
+      roomDetails: {
+        roomType: "",
+        size: "",
+        furnished: false,
+      },
+      preferences: {
+        gender: "",
+        smoking: false,
+        petsAllowed: false,
+      },
       availability: true,
+    },
+  });
+
+  const mutation = useMutation({
+    mutationFn: async (data: z.infer<typeof formSchema>) => {
+      const token = Cookies.get("token");
+      if (!token) {
+        throw new Error("Authentication token not found.");
+      }
+      const response = await axios.post(
+        "http://localhost:5000/api/advertisement/create",
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return response.data;
+    },
+    onSuccess: () => {
+      toast({
+        title: "İlan başarıyla oluşturuldu.",
+        description: "İlanınız başarıyla oluşturuldu ve yayına alındı.",
+        duration: 5000,
+      });
+
+      // Formu sıfırlıyoruz
+      form.reset();
+    },
+    onError: (error) => {
+      console.error(error);
+      toast({
+        title: "Hata!",
+        description: `İlan oluşturulurken bir hata oluştu. ${error.message}`,
+        variant: "destructive",
+        duration: 5000,
+      });
     },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      console.log(values);
-      toast(
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(values, null, 2)}</code>
-        </pre>
-      );
+      mutation.mutate(values);
     } catch (error) {
-      console.error("Form submission error", error);
-      toast.error("Failed to submit the form. Please try again.");
+      console.error(error);
+      toast({
+        title: "Hata!",
+        description: "İlan oluşturulurken bir hata oluştu!",
+        variant: "destructive",
+        duration: 5000,
+      });
     }
   }
-
   return (
-    <Form {...form} >
-      <form 
+    <Form {...form}>
+      <form
         onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-8 max-w-3xl mx-auto py-10 w-full px-4"
       >
@@ -184,7 +232,7 @@ export default function MyForm() {
               <FormControl>
                 <FileUploader
                   value={files}
-                  onValueChange={setFiles}
+                  onValueChange={(value) => setFiles(value || [])}
                   dropzoneOptions={dropZoneConfig}
                   className="relative bg-background rounded-lg p-2"
                 >
@@ -223,7 +271,7 @@ export default function MyForm() {
 
         <FormField
           control={form.control}
-          name="roomType"
+          name="roomDetails.roomType"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Oda Tipi</FormLabel>
@@ -247,7 +295,7 @@ export default function MyForm() {
 
         <FormField
           control={form.control}
-          name="size"
+          name="roomDetails.size"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Oda Büyüklüğü</FormLabel>
@@ -261,7 +309,7 @@ export default function MyForm() {
         />
         <FormField
           control={form.control}
-          name="furnished"
+          name="roomDetails.furnished"
           render={({ field }) => (
             <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
               <FormControl>
@@ -281,7 +329,7 @@ export default function MyForm() {
 
         <FormField
           control={form.control}
-          name="gender"
+          name="preferences.gender"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Cinsiyet</FormLabel>
@@ -303,7 +351,7 @@ export default function MyForm() {
         />
         <FormField
           control={form.control}
-          name="smoking"
+          name="preferences.smoking"
           render={({ field }) => (
             <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
               <FormControl>
@@ -322,7 +370,7 @@ export default function MyForm() {
         />
         <FormField
           control={form.control}
-          name="petsAllowed"
+          name="preferences.petsAllowed"
           render={({ field }) => (
             <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
               <FormControl>
@@ -358,7 +406,7 @@ export default function MyForm() {
             </FormItem>
           )}
         />
-        <Button type="submit">Submit</Button>
+        <Button type="submit">Kaydet</Button>
       </form>
     </Form>
   );

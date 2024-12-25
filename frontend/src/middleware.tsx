@@ -1,21 +1,24 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import jwt from "jsonwebtoken"; // Eğer JWT doğrulama gerekiyorsa
+import { jwtVerify } from "jose"; 
 
-// JWT doğrulama için bir yardımcı fonksiyon
-function verifyToken(token: string): unknown {
+// Helper function to verify JWT
+async function verifyToken(token: string): Promise<unknown> {
+  const secret = new TextEncoder().encode(process.env.JWT_SECRET || "your-secret-key");
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || "your-secret-key");
-    return decoded;
+    const { payload } = await jwtVerify(token, secret);
+    return payload;
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     throw new Error("Token geçersiz");
   }
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   // Token'i almak (cookie veya Authorization header)
-  const token = request.cookies.get("token")?.value || request.headers.get("Authorization")?.split(" ")[1];
+  const token = request.cookies.get("token")?.value;
+  console.log("girdi");
+  
 
   // Eğer token yoksa giriş sayfasına yönlendirme
   if (!token) {
@@ -24,7 +27,7 @@ export function middleware(request: NextRequest) {
 
   try {
     // Token doğrulama
-    const decodedToken = verifyToken(token);
+    const decodedToken = await verifyToken(token);
     console.log("Token doğrulandı:", decodedToken);
     return NextResponse.next();
   } catch (error) {
@@ -35,5 +38,5 @@ export function middleware(request: NextRequest) {
 
 // Middleware'in hangi rotalarda çalışacağını tanımlama
 export const config = {
-  matcher: ["/protected-route/:path*"], // Korunan rotalar
+  matcher: ["/account/:path*"], // Korunan rotalar
 };
