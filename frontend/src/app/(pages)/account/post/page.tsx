@@ -4,7 +4,7 @@ export default function page() {
   return (
     <div>
       
-      <div className="">
+      <div className="mt-[100px]">
         <NewPostForm />
       </div>
     </div>

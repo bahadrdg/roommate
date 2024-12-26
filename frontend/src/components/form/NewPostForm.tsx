@@ -113,8 +113,7 @@ export default function MyForm() {
         description: "İlanınız başarıyla oluşturuldu ve yayına alındı.",
         duration: 5000,
       });
-
-      // Formu sıfırlıyoruz
+      
       form.reset();
     },
     onError: (error) => {

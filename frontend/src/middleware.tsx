@@ -17,7 +17,6 @@ async function verifyToken(token: string): Promise<unknown> {
 export async function middleware(request: NextRequest) {
   // Token'i almak (cookie veya Authorization header)
   const token = request.cookies.get("token")?.value;
-  console.log("girdi");
   
 
   // Eğer token yoksa giriş sayfasına yönlendirme
@@ -26,9 +25,6 @@ export async function middleware(request: NextRequest) {
   }
 
   try {
-    // Token doğrulama
-    const decodedToken = await verifyToken(token);
-    console.log("Token doğrulandı:", decodedToken);
     return NextResponse.next();
   } catch (error) {
     console.error("Token doğrulama hatası:", error);

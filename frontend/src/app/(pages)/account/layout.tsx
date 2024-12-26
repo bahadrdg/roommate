@@ -6,10 +6,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div>
       <AccountHeader />
-      <SidebarProvider className="">
+      <SidebarProvider>
       <AppSidebar />
         <main className="flex-1" tabIndex={0}>
-          <SidebarTrigger />
+          <SidebarTrigger className="fixed mt-[107px] ml-2" />
           {children}
         </main>
       </SidebarProvider>

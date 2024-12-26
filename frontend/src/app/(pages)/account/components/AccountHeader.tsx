@@ -37,7 +37,7 @@ export default function Header() {
   };
 
   return (
-    <div className={`w-full z-50  border-b bg-white`}>
+    <div className={`fixed w-full z-50  border-b bg-[#fafafa]`}>
       <div className="container mx-auto px-4 md:px-8 lg:px-16 flex justify-between space-x-4 items-center">
         <a className="flex items-center" href="/">
           <Image
