@@ -6,7 +6,6 @@ const APIError = require('../utils/Error');
 const protect = asyncHandler(async (req, res, next) => {
   // Authorization header'dan token'i al
   const authHeader = req.headers.authorization;
-  console.log('authHeader:', authHeader);
   
 
   // Authorization header mevcut değilse hata döndür

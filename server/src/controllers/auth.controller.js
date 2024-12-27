@@ -58,4 +58,19 @@ const logoutUser = (req, res) => {
   res.status(200).json({ message: "Çıkış yapıldı" });
 };
 
-module.exports = { loginUser, logoutUser, getUserProfile };
+const auth = async (req, res) =>{
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) {
+    return res.status(401).json({ message: "Token gerekli" });
+  }
+
+  try {
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+    const { payload } = await jwtVerify(token, secret);
+    return res.status(200).json({ message: "Token geçerli", payload });
+  } catch (error) {
+    return res.status(401).json({ message: "Token geçersiz" });
+  }
+}
+
+module.exports = { loginUser, logoutUser, getUserProfile, auth };

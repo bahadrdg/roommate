@@ -24,13 +24,11 @@ export default function Header() {
   const router = useRouter();
 
   useEffect(() => {
-    // Çerezden token kontrolü
     const token = Cookies.get("token");
     setIsLoggedIn(!!token);
   }, []);
 
   const handleLogout = () => {
-    // Çerezi temizleyerek çıkış işlemini gerçekleştir
     Cookies.remove("token");
     setIsLoggedIn(false);
     router.push("/");

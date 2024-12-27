@@ -43,12 +43,16 @@ exports.createAdvertisement = asyncHandler(async (req, res) => {
 // Tüm ilanları listele
 exports.getAllAdvertisements = async (req, res) => {
     try {
-        const advertisements = await Advertisement.find().populate('postedBy', 'name email'); // İlan sahibinin ismini ve emailini getir
+        // Tüm ilanları getir
+        const advertisements = await Advertisement.find();
         res.status(200).json(advertisements);
     } catch (error) {
         res.status(500).json({ message: 'Server error', error });
     }
 };
+
+
+
 
 // Belirli bir ilanı getir
 exports.getAdvertisementById = async (req, res) => {

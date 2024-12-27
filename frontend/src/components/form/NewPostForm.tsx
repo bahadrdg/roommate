@@ -33,29 +33,43 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { toast } from "@/hooks/use-toast";
+import { Switch } from "@/components/ui/switch";
 
 const formSchema = z.object({
-  title: z.string().min(3, {message:"Başlık en az 3 karakter olamlı."}).max(150, {message:"Başlık en fazla 150 karakter olmalı."}),
-  description: z.string().min(5 ,{message: "İçerik en az 5 karakter olmalı."}).max(500, {message:"İçerik en fazla 500 karakter olmalı."}),
-  price: z.string(),
-  location: z.tuple([z.string(), z.string({message:"Dizi en az 2 öğe içermelidir"}).optional()]),
+  title: z
+    .string()
+    .min(3, { message: "Başlık en az 3 karakter olamlı." })
+    .max(150, { message: "Başlık en fazla 150 karakter olmalı." })
+    .nonempty({ message: "Başlık boş olamaz." }),
+  description: z
+    .string()
+    .min(5, { message: "İçerik en az 5 karakter olmalı." })
+    .max(500, { message: "İçerik en fazla 500 karakter olmalı." })
+    .nonempty({ message: "İçerik boş olamaz." }),
+  price: z.string().nonempty({ message: "Fiyat boş olamaz." }),
+  location: z.tuple([
+    z.string(),
+    z.string({ message: "Dizi en az 2 öğe içermelidir" }).optional(),
+  ]),
   images: z.string(),
   roomDetails: z.object({
-    roomType: z.string(),
-    size: z.string().max(5000),
-    furnished: z.boolean()
+    roomType: z.string().nonempty({ message: "Oda tipi boş olamaz." }),
+    size: z
+      .string()
+      .max(5000)
+      .nonempty({ message: "Oda büyüklüğü boş olamaz." }),
+    furnished: z.boolean(),
   }),
   preferences: z.object({
-    gender: z.string(),
+    gender: z.string().nonempty({ message: "Cinsiyet boş olamaz." }),
     smoking: z.boolean(),
-    petsAllowed: z.boolean()
+    petsAllowed: z.boolean(),
   }),
-  availability: z.boolean()
+  availability: z.boolean(),
 });
 
 const dropZoneConfig = {
@@ -113,7 +127,7 @@ export default function MyForm() {
         description: "İlanınız başarıyla oluşturuldu ve yayına alındı.",
         duration: 5000,
       });
-      
+
       form.reset();
     },
     onError: (error) => {
@@ -306,25 +320,6 @@ export default function MyForm() {
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="roomDetails.furnished"
-          render={({ field }) => (
-            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-              <FormControl>
-                <Checkbox
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
-              </FormControl>
-              <div className="space-y-1 leading-none">
-                <FormLabel>Eşyalı mı?</FormLabel>
-
-                <FormMessage />
-              </div>
-            </FormItem>
-          )}
-        />
 
         <FormField
           control={form.control}
@@ -348,13 +343,42 @@ export default function MyForm() {
             </FormItem>
           )}
         />
+
+        <FormField
+          control={form.control}
+          name="roomDetails.furnished"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+              <FormControl>
+                {/* <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                /> */}
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
+              <div className="space-y-1 leading-none">
+                <FormLabel>Eşyalı mı?</FormLabel>
+
+                <FormMessage />
+              </div>
+            </FormItem>
+          )}
+        />
+
         <FormField
           control={form.control}
           name="preferences.smoking"
           render={({ field }) => (
             <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
               <FormControl>
-                <Checkbox
+                {/* <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                /> */}
+                <Switch
                   checked={field.value}
                   onCheckedChange={field.onChange}
                 />
@@ -373,7 +397,11 @@ export default function MyForm() {
           render={({ field }) => (
             <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
               <FormControl>
-                <Checkbox
+                {/* <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                /> */}
+                <Switch
                   checked={field.value}
                   onCheckedChange={field.onChange}
                 />
@@ -392,7 +420,11 @@ export default function MyForm() {
           render={({ field }) => (
             <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
               <FormControl>
-                <Checkbox
+                {/* <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                /> */}
+                <Switch
                   checked={field.value}
                   onCheckedChange={field.onChange}
                 />
