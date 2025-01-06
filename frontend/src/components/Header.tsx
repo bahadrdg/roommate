@@ -337,6 +337,9 @@ export default function Header() {
             <DropdownMenuContent>
               {isLoggedIn ? (
                 <>
+                <DropdownMenuItem className="font-bold">
+                    <a href="/account">Hesap</a>
+                  </DropdownMenuItem>
                   <DropdownMenuItem className="font-bold">
                     <a href="/">Mesajlar</a>
                   </DropdownMenuItem>

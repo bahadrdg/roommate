@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -26,6 +25,7 @@ import {
   FileUploaderContent,
   FileUploaderItem,
 } from "@/components/ui/file-upload";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -160,80 +160,79 @@ export default function MyForm() {
         onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-8 max-w-3xl mx-auto py-10 w-full px-4"
       >
-        <FormField
-          control={form.control}
-          name="title"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>İlan Başlığı</FormLabel>
-              <FormControl>
-                <Input placeholder="İlan Başlığı" type="text" {...field} />
-              </FormControl>
-              <FormDescription>İlan Başlığı</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <FormField
+            control={form.control}
+            name="title"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>İlan Başlığı</FormLabel>
+                <FormControl>
+                  <Input placeholder="İlan Başlığı" type="text" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Açıklama</FormLabel>
-              <FormControl>
-                <Input placeholder="Açıklama" type="text" {...field} />
-              </FormControl>
-              <FormDescription>Açıklama</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Açıklama</FormLabel>
+                <FormControl>
+                  <Textarea placeholder="Açıklama" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <FormField
+            control={form.control}
+            name="price"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Fiyat</FormLabel>
+                <FormControl>
+                  <Input placeholder="Fiyat" type="number" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="price"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Fiyat</FormLabel>
-              <FormControl>
-                <Input placeholder="Fiyat" type="number" {...field} />
-              </FormControl>
-              <FormDescription>Fiyat</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="location"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Konum</FormLabel>
-              <FormControl>
-                <LocationSelector
-                  onCountryChange={(country) => {
-                    setCountryName(country?.name || "");
-                    form.setValue(field.name, [
-                      country?.name || "",
-                      stateName || "",
-                    ]);
-                  }}
-                  onStateChange={(state) => {
-                    setStateName(state?.name || "");
-                    form.setValue(field.name, [
-                      countryName || "",
-                      state?.name || "",
-                    ]);
-                  }}
-                />
-              </FormControl>
-              <FormDescription>Konum</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="location"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Konum</FormLabel>
+                <FormControl>
+                  <LocationSelector
+                    onCountryChange={(country) => {
+                      setCountryName(country?.name || "");
+                      form.setValue(field.name, [
+                        country?.name || "",
+                        stateName || "",
+                      ]);
+                    }}
+                    onStateChange={(state) => {
+                      setStateName(state?.name || "");
+                      form.setValue(field.name, [
+                        countryName || "",
+                        state?.name || "",
+                      ]);
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <FormField
           control={form.control}
@@ -282,161 +281,172 @@ export default function MyForm() {
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="roomDetails.roomType"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Oda Tipi</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <FormField
+            control={form.control}
+            name="roomDetails.roomType"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Oda Tipi</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="Single">Bekar</SelectItem>
+                    <SelectItem value="Double">Çift</SelectItem>
+                    <SelectItem value="Shared">Paylaşımlı</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="roomDetails.size"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Oda Büyüklüğü</FormLabel>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="" />
-                  </SelectTrigger>
+                  <Input placeholder="Oda Büyüklüğü" type="" {...field} />
                 </FormControl>
-                <SelectContent>
-                  <SelectItem value="Single">Bekar</SelectItem>
-                  <SelectItem value="Double">Çift</SelectItem>
-                  <SelectItem value="Shared">Paylaşımlı</SelectItem>
-                </SelectContent>
-              </Select>
 
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="roomDetails.size"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Oda Büyüklüğü</FormLabel>
-              <FormControl>
-                <Input placeholder="Oda Büyüklüğü" type="" {...field} />
-              </FormControl>
+          <FormField
+            control={form.control}
+            name="preferences.gender"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Cinsiyet</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Cinsiyet" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="Famale">Kadın</SelectItem>
+                    <SelectItem value="Male">Erkek</SelectItem>
+                  </SelectContent>
+                </Select>
 
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
-        <FormField
-          control={form.control}
-          name="preferences.gender"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Cinsiyet</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+          <FormField
+            control={form.control}
+            name="roomDetails.furnished"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Cinsiyet" />
-                  </SelectTrigger>
+                  {/* <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                /> */}
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
                 </FormControl>
-                <SelectContent>
-                  <SelectItem value="Famale">Kadın</SelectItem>
-                  <SelectItem value="Male">Erkek</SelectItem>
-                </SelectContent>
-              </Select>
+                <div className="space-y-1 leading-none">
+                  <FormLabel>Eşyalı mı?</FormLabel>
 
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                  <FormMessage />
+                </div>
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="roomDetails.furnished"
-          render={({ field }) => (
-            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-              <FormControl>
-                {/* <Checkbox
+          <FormField
+            control={form.control}
+            name="preferences.smoking"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                <FormControl>
+                  {/* <Checkbox
                   checked={field.value}
                   onCheckedChange={field.onChange}
                 /> */}
-                <Switch
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
-              </FormControl>
-              <div className="space-y-1 leading-none">
-                <FormLabel>Eşyalı mı?</FormLabel>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+                <div className="space-y-1 leading-none">
+                  <FormLabel>Sigara İçilebilir mi?</FormLabel>
 
-                <FormMessage />
-              </div>
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="preferences.smoking"
-          render={({ field }) => (
-            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-              <FormControl>
-                {/* <Checkbox
+                  <FormMessage />
+                </div>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="preferences.petsAllowed"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                <FormControl>
+                  {/* <Checkbox
                   checked={field.value}
                   onCheckedChange={field.onChange}
                 /> */}
-                <Switch
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
-              </FormControl>
-              <div className="space-y-1 leading-none">
-                <FormLabel>Sigara İçilebilir mi?</FormLabel>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+                <div className="space-y-1 leading-none">
+                  <FormLabel>Evcil Hayvan Girebilir mi?</FormLabel>
 
-                <FormMessage />
-              </div>
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="preferences.petsAllowed"
-          render={({ field }) => (
-            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-              <FormControl>
-                {/* <Checkbox
+                  <FormMessage />
+                </div>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="availability"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                <FormControl>
+                  {/* <Checkbox
                   checked={field.value}
                   onCheckedChange={field.onChange}
                 /> */}
-                <Switch
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
-              </FormControl>
-              <div className="space-y-1 leading-none">
-                <FormLabel>Evcil Hayvan Girebilir mi?</FormLabel>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+                <div className="space-y-1 leading-none">
+                  <FormLabel>Kullanılabilir mi?</FormLabel>
 
-                <FormMessage />
-              </div>
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="availability"
-          render={({ field }) => (
-            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-              <FormControl>
-                {/* <Checkbox
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                /> */}
-                <Switch
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
-              </FormControl>
-              <div className="space-y-1 leading-none">
-                <FormLabel>Kullanılabilir mi?</FormLabel>
+                  <FormMessage />
+                </div>
+              </FormItem>
+            )}
+          />
+        </div>
 
-                <FormMessage />
-              </div>
-            </FormItem>
-          )}
-        />
         <Button type="submit">Kaydet</Button>
       </form>
     </Form>

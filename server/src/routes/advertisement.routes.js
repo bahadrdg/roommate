@@ -7,6 +7,7 @@ const authMiddleware = require('../middlewares/auth.middleware');
 router.post('/create', authMiddleware.protect , advertisementController.createAdvertisement);
 router.get('/', advertisementController.getAllAdvertisements);
 router.get('/:id', advertisementController.getAdvertisementById);
+router.get('/user/:id' ,advertisementController.getAdvertisementsByUser);
 router.put('/:id',  advertisementController.updateAdvertisement);
 router.delete('/:id', advertisementController.deleteAdvertisement);
 

@@ -126,3 +126,28 @@ exports.filterAdvertisements = async (req, res) => {
         res.status(500).json({ message: 'Server error', error });
     }
 };
+
+// Kullanıcıya ait ilanları listele
+exports.getAdvertisementsByUser = asyncHandler(async (req, res) => {
+    try {
+        const { userId } = req.params; // Parametreden userId alınıyor
+
+        // Belirtilen userId'ye sahip ilanları bul
+        const userAdvertisements = await Advertisement.find({ postedBy: userId })
+            .populate('postedBy', 'name email'); // Kullanıcı bilgilerini ekle
+
+        if (!userAdvertisements.length) {
+            return res.status(404).json({ 
+                message: 'No advertisements found for this user' 
+            });
+        }
+
+        res.status(200).json(userAdvertisements);
+    } catch (error) {
+        res.status(500).json({ 
+            message: 'Server error', 
+            error: error.message 
+        });
+    }
+});
+

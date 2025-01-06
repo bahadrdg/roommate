@@ -1,4 +1,4 @@
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react"
+import { CirclePlus, Megaphone} from "lucide-react"
 
 import {
   Sidebar,
@@ -13,30 +13,15 @@ import {
 
 const items = [
   {
-    title: "Home",
-    url: "#",
-    icon: Home,
+    title: "İlan Ekle",
+    url: "/account/post",
+    icon: CirclePlus,
   },
   {
-    title: "Inbox",
-    url: "#",
-    icon: Inbox,
-  },
-  {
-    title: "Calendar",
-    url: "#",
-    icon: Calendar,
-  },
-  {
-    title: "Search",
-    url: "#",
-    icon: Search,
-  },
-  {
-    title: "Settings",
-    url: "#",
-    icon: Settings,
-  },
+    title: "İlanlarım",
+    url: "/account/advertisement",
+    icon: Megaphone,
+  }
 ]
 
 export function AppSidebar() {
